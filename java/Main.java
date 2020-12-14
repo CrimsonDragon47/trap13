@@ -1,4 +1,3 @@
-package com.syd;
 
 
 import java.io.FileOutputStream;
