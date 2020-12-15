@@ -24,7 +24,7 @@ public class Main {
    
    do{
      
-     if(prog++%1000000==0) System.out.printf("=%.2f%% of sequences%n",100*prog/(float)max);
+     if(prog++%100000000==0) System.out.printf("=%.2f%% of sequences%n",100*prog/(float)max);
      
      
      //parse combination 
