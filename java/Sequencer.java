@@ -9,6 +9,7 @@ import java.util.HashMap;
 /** 
 * e1: invalid value reference; check combination assignment.
 * e2: as above for the stack in getSequence.
+* DEPRICATED (and broken) (left for legacy purposes only)
 */
 public class Sequencer{
 
