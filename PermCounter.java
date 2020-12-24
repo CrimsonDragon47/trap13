@@ -1,4 +1,4 @@
-package com.syd;
+//package com.syd;
 
 import java.io.PrintStream;
 import java.util.*;
@@ -9,7 +9,7 @@ import java.util.HashMap;
 public class PermCounter implements Runnable{
 
   public static void main(String[] args) {
-     int nThreads = 4;
+     int nThreads = 8;
      PermCounter.start(System.out, nThreads);
      System.out.println("Terminated");
      
