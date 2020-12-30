@@ -392,7 +392,7 @@ public class PermCounter{
                         }
                     }
                 }
-                out.printf("%s complete%n");
+                out.printf("%s complete%n", name);
             }
         }
 
