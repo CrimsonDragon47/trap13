@@ -13,7 +13,7 @@ public class PermCounter{
     private static final boolean upper = false;//true;//
 
     public static void main(String[] args) {
-        //int nThreads = 4;
+        int nThreads = 8;
         new PermCounter(System.out).run();
         System.out.println("Terminated.");
 
