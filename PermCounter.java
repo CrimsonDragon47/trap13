@@ -17,11 +17,11 @@ public class PermCounter{
         System.out.printf("Terminated.%n%n");
     }
 
-    
+
     private PrintStream out;
     private Counter<Loop> loopCounter;
     private Counter<Element> reachCounter;
-    
+
     private PermCounter(PrintStream out){
         this.out = out;
     }
@@ -43,7 +43,7 @@ public class PermCounter{
         out.println("Combining.....");
 
         for(int i=1;i<nThreads;i++) st[0].combine(st[i].getLoopList());
-       
+
 
         long checksum = factorial(13)/24;
         long totalCount = 0l;
@@ -56,19 +56,19 @@ public class PermCounter{
         if(totalCount==checksum){
             out.println("PASS");
 
-            
+
             loopCounter = new Counter(perms, "LC");
             loopCounter.waitFor();
 
             BigInteger numL = loopCounter.num;
             BigInteger numR = BigInteger.ZERO;
             BigInteger den = loopCounter.den;
-            
+
             if(upper){
                 out.println("Adding pre-seq....");
                 PreList pre = new PreList();
                 for(Loop l:perms) pre.add(l);
-                
+
                 reachCounter = new Counter(pre.getList(), "RC");
                 reachCounter.waitFor();
                 numR=reachCounter.num;
@@ -101,16 +101,16 @@ public class PermCounter{
             }else{
                 out.println("FAIL.");
             }
-            
+
         }else{
             out.println("FAIL");
         }
-        
+
     }
 
 
     private class Stacker implements Runnable{
-        
+
         private int threadId;
         private Thread t;
         private LoopList loops = new LoopList();
@@ -226,8 +226,8 @@ public class PermCounter{
         public int hashCode(){
             return (int)(fp%16777216);//mod2^24
         }
-        
-        @Override 
+
+        @Override
         public int compareTo(Object o){
             int x=0;
             if (o instanceof Element) x=seq.length-((Element)o).seq.length;
@@ -236,7 +236,7 @@ public class PermCounter{
         }
 
     }
-    
+
 
     private class LoopList{
         private HashMap<Long,Loop> hm = new HashMap(8388608);//2^23
@@ -363,7 +363,7 @@ public class PermCounter{
                                 permCount=permCount.multiply(new BigInteger(Long.toString(t1.count)));
                                 permCount=permCount.multiply(new BigInteger(Long.toString(t2.count)));
                                 permCount=permCount.multiply(new BigInteger(Long.toString(t3.count)));
-                                
+
                                 den = den.add(permCount.multiply(new BigInteger("331776")));
                                 long count;
                                 if((count = isPossible(t0.seq,t1.seq,t2.seq,t3.seq))>0){
@@ -390,34 +390,34 @@ public class PermCounter{
             return x;
         }
     }
-  
+
     private class PreList{
         //private HashMap<Long,Element> heap = new HashMap();
         private HashMap<Long,Element> hm = new HashMap();
-        
+
         public void add(Loop l){
-            
-            
+
+
             for(Element e:l.pre){
 
                 Element pre = new Element(arrayCombine(l.seq,e.seq));
                 pre.count = e.count;
-                
+
                 //Element sub = new Element(Arrays.copyOfRange(seq,1,seq.length));
 
                 synchronized(this){
-                    
-                    
+
+
                     if(hm.containsKey(pre.fp)){
                         hm.get(pre.fp).count+=pre.count;
                     }else{
                         hm.put(pre.fp,pre);
                     }
-                    
+
                 }
             }
         }
-    
+
         public List<Element> getList(){
             List<Element> pre;
             synchronized(this){
@@ -428,31 +428,46 @@ public class PermCounter{
             //TODO link elements using hm heap
             return new subLinker(pre).getList();
         }
-        
+
         private class subLinker{
             List<Element> pre;
             HashMap<Long,Element> target = new HashMap();
             HashMap<Long,Element> heap = new HashMap();
-            
+
             public subLinker(List<Element> pre){
                 this.pre = pre;
             }
-            
+
             public List<Element> getList(){
                 for(Element e:pre){
-                    
-                    if(e.seq.length<=2){
-                        target.put(e.fp,e);
-                    }else{
-                        //TODO
+
+                    if(e.seq.length>2){
+                        
+                        Element sub = new Element(Arrays.copyOfRange(e.seq,1,e.seq.length));
+                        sub.count=0l;
+                        //e.sub=sub;
+                        
+                        if(target.containsKey(sub.fp)){
+                            sub.count = target.get(sub.fp).count;
+                            target.remove(sub.fp);
+                            heap.put(sub.fp,sub);
+                            e.sub=sub;
+                        }else if(heap.containsKey(sub.fp)){
+                            e.sub = heap.get(sub.fp);
+                        }else{
+                            heap.put(sub.fp,sub);
+                            e.sub=sub;
+                        }
+                        
                     }
+                    target.put(e.fp,e);
                 }
-                
+
                 return new ArrayList(target.values());
             }
-            
+
         }
-        
+
     }
 
     private static long factorial(int x){
